@@ -1,29 +1,12 @@
 import axios from 'axios';
 
-/**
- * API Service
- * 
- * Axios: HTTP client library for making API requests
- * - Easier than fetch() API
- * - Automatic JSON parsing
- * - Request/response interceptors
- * 
- * axios.create(): Creates a configured axios instance
- * baseURL: Base URL for all requests
- * headers: Default headers sent with every request
- */
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: process.env.REACT_APP_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-/**
- * Request Interceptor
- * Runs before every request
- * Adds JWT token to Authorization header if available
- */
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -32,21 +15,13 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-/**
- * Response Interceptor
- * Runs after every response
- * Handles errors globally
- */
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Unauthorized - token expired or invalid
       localStorage.removeItem('token');
       window.location.href = '/login';
     }
@@ -54,77 +29,17 @@ api.interceptors.response.use(
   }
 );
 
-/**
- * Auth API
- */
 export const authAPI = {
-  /**
-   * Register new user
-   * POST /api/auth/register
-   */
-  register: async (userData) => {
-    const response = await api.post('/auth/register', userData);
-    return response.data;
-  },
-
-  /**
-   * Login user
-   * POST /api/auth/login
-   */
-  login: async (credentials) => {
-    const response = await api.post('/auth/login', credentials);
-    return response.data;
-  },
+  register: (userData) => api.post('/auth/register', userData).then(res => res.data),
+  login: (credentials) => api.post('/auth/login', credentials).then(res => res.data),
 };
 
-/**
- * Task API
- */
 export const taskAPI = {
-  /**
-   * Get all tasks
-   * GET /api/tasks
-   */
-  getAll: async () => {
-    const response = await api.get('/tasks');
-    return response.data;
-  },
-
-  /**
-   * Get task by ID
-   * GET /api/tasks/{id}
-   */
-  getById: async (id) => {
-    const response = await api.get(`/tasks/${id}`);
-    return response.data;
-  },
-
-  /**
-   * Create new task
-   * POST /api/tasks
-   */
-  create: async (taskData) => {
-    const response = await api.post('/tasks', taskData);
-    return response.data;
-  },
-
-  /**
-   * Update task
-   * PUT /api/tasks/{id}
-   */
-  update: async (id, taskData) => {
-    const response = await api.put(`/tasks/${id}`, taskData);
-    return response.data;
-  },
-
-  /**
-   * Delete task
-   * DELETE /api/tasks/{id}
-   */
-  delete: async (id) => {
-    await api.delete(`/tasks/${id}`);
-  },
+  getAll: () => api.get('/tasks').then(res => res.data),
+  getById: (id) => api.get(`/tasks/${id}`).then(res => res.data),
+  create: (taskData) => api.post('/tasks', taskData).then(res => res.data),
+  update: (id, taskData) => api.put(`/tasks/${id}`, taskData).then(res => res.data),
+  delete: (id) => api.delete(`/tasks/${id}`),
 };
 
 export default api;
-
