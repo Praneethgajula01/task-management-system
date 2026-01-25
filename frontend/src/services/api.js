@@ -12,6 +12,9 @@ api.interceptors.request.use(
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('Token added to request:', token.substring(0, 20) + '...');
+    } else {
+      console.warn('No token found in localStorage');
     }
     return config;
   },
@@ -44,9 +47,27 @@ export const authAPI = {
 export const taskAPI = {
   getAll: () => api.get('/api/tasks').then(res => res.data),
   getById: (id) => api.get(`/api/tasks/${id}`).then(res => res.data),
-  create: (taskData) => api.post('/api/tasks', taskData).then(res => res.data),
-  update: (id, taskData) => api.put(`/tasks/${id}`, taskData).then(res => res.data),
-  delete: (id) => api.delete(`/tasks/${id}`),
+  create: (taskData) => {
+    console.log('Creating task:', taskData);
+    return api.post('/api/tasks', taskData).then(res => {
+      console.log('Task created:', res.data);
+      return res.data;
+    });
+  },
+  update: (id, taskData) => {
+    console.log('Updating task:', id, taskData);
+    return api.put(`/api/tasks/${id}`, taskData).then(res => {
+      console.log('Task updated:', res.data);
+      return res.data;
+    });
+  },
+  delete: (id) => {
+    console.log('Deleting task:', id);
+    return api.delete(`/api/tasks/${id}`).then(res => {
+      console.log('Task deleted');
+      return res.data;
+    });
+  },
 };
 
 export default api;

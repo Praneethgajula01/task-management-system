@@ -68,9 +68,11 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of("*")); // Allow any origin during development
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*", "Authorization", "Content-Type"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(false); // No cookies needed for JWT auth
+        configuration.setMaxAge(3600L); // Cache preflight for 1 hour
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -99,14 +101,12 @@ public class SecurityConfig {
             
             // Configure authorization rules
             .authorizeHttpRequests(auth -> auth
-                // Allow OPTIONS requests for CORS preflight
+                // Allow OPTIONS requests for CORS preflight (MUST be first)
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // Allow H2 console access (for debugging)
                 .requestMatchers("/h2-console/**").permitAll()
-                // Public endpoints (no authentication required) - MUST be before anyRequest()
+                // Public endpoints (no authentication required)
                 .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
-                // Public endpoints pattern (backup)
-                .requestMatchers("/api/auth/**").permitAll()
                 // All other endpoints require authentication
                 .anyRequest().authenticated()
             )
