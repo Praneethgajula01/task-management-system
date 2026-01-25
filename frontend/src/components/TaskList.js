@@ -81,7 +81,9 @@ function TaskList({ onLogout }) {
       resetForm();
       fetchTasks();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to save task.');
+      console.error('Submit error:', err);
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to save task.';
+      setError(errorMsg);
     }
   };
 
@@ -118,7 +120,9 @@ function TaskList({ onLogout }) {
       await taskAPI.delete(id);
       fetchTasks();
     } catch (err) {
-      setError('Failed to delete task.');
+      console.error('Delete error:', err);
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to delete task.';
+      setError(errorMsg);
     }
   };
 
