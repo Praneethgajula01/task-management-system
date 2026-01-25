@@ -30,14 +30,14 @@ api.interceptors.response.use(
 );
 
 export const authAPI = {
-  register: (userData) => api.post('/auth/register', userData).then(res => res.data),
-  login: (credentials) => api.post('/auth/login', credentials).then(res => res.data),
+  register: (userData) => api.post('/api/auth/register', userData).then(res => res.data),
+  login: (credentials) => api.post('/api/auth/login', credentials).then(res => res.data),
 };
 
 export const taskAPI = {
-  getAll: () => api.get('/tasks').then(res => res.data),
-  getById: (id) => api.get(`/tasks/${id}`).then(res => res.data),
-  create: (taskData) => api.post('/tasks', taskData).then(res => res.data),
+  getAll: () => api.get('/api/tasks').then(res => res.data),
+  getById: (id) => api.get(`/api/tasks/${id}`).then(res => res.data),
+  create: (taskData) => api.post('/api/tasks', taskData).then(res => res.data),
   update: (id, taskData) => api.put(`/tasks/${id}`, taskData).then(res => res.data),
   delete: (id) => api.delete(`/tasks/${id}`),
 };
