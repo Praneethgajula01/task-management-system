@@ -43,9 +43,14 @@ public class TaskController {
      */
     @GetMapping
     public ResponseEntity<List<TaskResponse>> getAllTasks() {
-        Long userId = securityUtil.getCurrentUserId();
-        List<TaskResponse> tasks = taskService.getAllTasks(userId);
-        return ResponseEntity.ok(tasks);
+        try {
+            Long userId = securityUtil.getCurrentUserId();
+            List<TaskResponse> tasks = taskService.getAllTasks(userId);
+            return ResponseEntity.ok(tasks);
+        } catch (RuntimeException e) {
+            System.err.println("Error getting tasks: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
     
     /**

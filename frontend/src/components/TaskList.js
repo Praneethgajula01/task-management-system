@@ -40,12 +40,19 @@ function TaskList({ onLogout }) {
   const fetchTasks = async () => {
     try {
       setLoading(true);
+      console.log('Fetching tasks from:', process.env.REACT_APP_API_URL);
       const data = await taskAPI.getAll();
+      console.log('Tasks fetched:', data);
       setTasks(data);
       setError('');
     } catch (err) {
-      setError('Failed to load tasks. Please try again.');
-      console.error('Error fetching tasks:', err);
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to load tasks. Please try again.';
+      console.error('Error fetching tasks:', {
+        status: err.response?.status,
+        message: errorMsg,
+        fullError: err
+      });
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
